@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Système Éducatif Sénégalais - DataFlow360</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #00A550 0%, #FFD700 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #00A550;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            padding: 0.4rem 0.8rem;
+            background: transparent;
+            border: 2px solid #00A550;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #00A550;
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+
+        .nav-tab:hover, .nav-tab.active {
+            background: #00A550;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 165, 80, 0.4);
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            display: none;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .api-info {
+            background: #00A550;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .api-info:hover {
+            background: #008A40;
+            transform: scale(1.05);
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #00A550;
+            box-shadow: 0 0 0 3px rgba(0, 165, 80, 0.1);
+        }
+
+        .filter-select {
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1rem;
+            min-width: 150px;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            background: #00A550;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #008A40;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 165, 80, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .page-btn {
+            padding: 0.5rem 1rem;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover, .page-btn.active {
+            background: #00A550;
+            color: white;
+            border-color: #00A550;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin: 0 1rem;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(135deg, #00A550, #008A40);
+            color: white;
+            padding: 0.8rem;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            font-size: 0.9rem;
+        }
+
+        td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #f0f0f0;
+            transition: background 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        tr:hover td {
+            background: #f8fff8;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #00A550, #008A40);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 165, 80, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #00A550;
+            font-size: 1.2rem;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #00A550;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-right: 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .badge {
+            padding: 0.25rem 0.5rem;
+            border-radius: 15px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+
+        .badge-success { background: #d4edda; color: #155724; }
+        .badge-warning { background: #fff3cd; color: #856404; }
+        .badge-info { background: #d1ecf1; color: #0c5460; }
+        .badge-primary { background: #cce7ff; color: #004085; }
+        .badge-danger { background: #f8d7da; color: #721c24; }
+
+        .grade {
+            font-weight: bold;
+            padding: 0.2rem 0.5rem;
+            border-radius: 5px;
+        }
+
+        .grade-excellent { background: #d4edda; color: #155724; }
+        .grade-good { background: #d1ecf1; color: #0c5460; }
+        .grade-average { background: #fff3cd; color: #856404; }
+        .grade-poor { background: #f8d7da; color: #721c24; }
+
+        .api-doc {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .api-endpoint {
+            background: #333;
+            color: #00ff00;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 0.5rem 0;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-tabs {
+                justify-content: center;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">🇸🇳 Système Éducatif Sénégalais</div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" onclick="showSection('dashboard')">Dashboard</button>
+                <button class="nav-tab" onclick="showSection('regions')">Régions</button>
+                <button class="nav-tab" onclick="showSection('etablissements')">Établissements</button>
+                <button class="nav-tab" onclick="showSection('enseignants')">Enseignants</button>
+                <button class="nav-tab" onclick="showSection('eleves')">Élèves</button>
+                <button class="nav-tab" onclick="showSection('matieres')">Matières</button>
+                <button class="nav-tab" onclick="showSection('cours')">Cours</button>
+                <button class="nav-tab" onclick="showSection('notes')">Notes</button>
+                <button class="nav-tab" onclick="showSection('presences')">Présences</button>
+                <button class="nav-tab" onclick="showSection('api')">API</button>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="section-header">
+                <h2 class="section-title">📊 Tableau de Bord Éducation Sénégal</h2>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-regions">14</div>
+                    <div class="stat-label">Régions</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-etablissements">100</div>
+                    <div class="stat-label">Établissements</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-enseignants">1500</div>
+                    <div class="stat-label">Enseignants</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-eleves">10000</div>
+                    <div class="stat-label">Élèves</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-matieres">250</div>
+                    <div class="stat-label">Matières</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="stat-cours">3750</div>
+                    <div class="stat-label">Cours</div>
+                </div>
+            </div>
+
+            <div style="background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                <h3>🚀 Plateforme DataFlow360 - Éducation Sénégal</h3>
+                <p style="margin: 1rem 0; line-height: 1.6;">
+                    Système complet de gestion des données éducatives du Sénégal avec les 14 régions officielles.
+                    Données cohérentes et relationnelles pour vos projets de data engineering.
+                </p>
+                <div style="background: #f8f9ff; padding: 1rem; border-radius: 10px; border-left: 4px solid #00A550;">
+                    <strong>Fonctionnalités :</strong>
+                    <ul style="margin-top: 0.5rem; padding-left: 2rem;">
+                        <li>Données réalistes avec noms sénégalais</li>
+                        <li>Relations cohérentes entre toutes les entités</li>
+                        <li>Système de notation sur 20 avec 3 types d'évaluation</li>
+                        <li>Pagination automatique (100 éléments par page)</li>
+                        <li>API REST complète pour scraping et consommation</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Régions Section -->
+        <section id="regions" class="section">
+            <div class="section-header">
+                <h2 class="section-title">🗺️ Régions du Sénégal</h2>
+                <div class="api-info" onclick="showApiInfo('regions')">API: /api/regions</div>
+            </div>
+            
+            <div class="controls">
+                <input type="text" class="search-box" placeholder="Rechercher une région..." 
+                       oninput="filterTable('regions-table', this.value)">
+                <button class="btn" onclick="refreshData('regions')">🔄 Actualiser</button>
+                <button class="btn btn-secondary" onclick="exportData('regions')">📥 Exporter</button>
+            </div>
+
+            <div class="table-container">
+                <table id="regions-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom Région</th>
+                            <th>Chef-lieu</th>
+                            <th>Nb Établissements</th>
+                            <th>Population Scolaire</th>
+                        </tr>
+                    </thead>
+                    <tbody id="regions-tbody">
+                        <tr><td colspan="5" class="loading"><div class="spinner"></div>Chargement des données...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="regions-pagination"></div>
+        </section>
+
+        <!-- Établissements Section -->
+        <section id="etablissements" class="section">
+            <div class="section-header">
+                <h2 class="section-title">🏫 Établissements</h2>
+                <div class="api-info" onclick="showApiInfo('etablissements')">API: /api/etablissements</div>
+            </div>
+            
+            <div class="controls">
+                <input type="text" class="search-box" placeholder="Rechercher un établissement..." 
+                       oninput="filterTable('etablissements-table', this.value)">
+                <select class="filter-select" onchange="filterByRegion('etablissements', this.value)">
+                    <option value="">Toutes les régions</option>
+                </select>
+                <button class="btn" onclick="refreshData('etablissements')">🔄 Actualiser</button>
+                <button class="btn btn-secondary" onclick="exportData('etablissements')">📥 Exporter</button>
+            </div>
+
+            <div class="table-container">
+                <table id="etablissements-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Type</th>
+                            <th>Statut</th>
+                            <th>Région</th>
+                            <th>Effectif</th>
+                        </tr>
+                    </thead>
+                    <tbody id="etablissements-tbody">
+                        <tr><td colspan="6" class="loading"><div class="spinner"></div>Chargement des données...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="etablissements-pagination"></div>
+        </section>
+
+        <!-- Enseignants Section -->
+        <section id="enseignants" class="section">
+            <div class="section-header">
+                <h2 class="section-title">👨‍🏫 Enseignants</h2>
+                <div class="api-info" onclick="showApiInfo('enseignants')">API: /api/enseignants</div>
+            </div>
+            
+            <div class="controls">
+                <input type="text" class="search-box" placeholder="Rechercher un enseignant..." 
+                       oninput="filterTable('enseignants-table', this.value)">
+                <select class="filter-select" onchange="filterByDomain('enseignants', this.value)">
+                    <option value="">Tous les domaines</option>
+                </select>
+                <button class="btn" onclick="refreshData('enseignants')">🔄 Actualiser</button>
+                <button class="btn btn-secondary" onclick="exportData('enseignants')">📥 Exporter</button>
+            </div>
+
+            <div class="table-container">
+                <table id="enseignants-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom Complet</th>
+                            <th>Domaine</th>
+                            <th>Email</th>
+                            <th>Sexe</th>
+                            <th>Établissement</th>
+                        </tr>
+                    </thead>
+                    <tbody id="enseignants-tbody">
+                        <tr><td colspan="6" class="loading"><div class="spinner"></div>Chargement des données...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="enseignants-pagination"></div>
+        </section>
+
+        <!-- Élèves Section -->
+        <section id="eleves" class="section">
+            <div class="section-header">
+                <h2 class="section-title">👨‍🎓 Élèves</h2>
+                <div class="api-info" onclick="showApiInfo('eleves')">API: /api/eleves</div>
+            </div>
+            
+            <div class="controls">
+                <input type="text" class="search-box" placeholder="Rechercher un élève..." 
+                       oninput="filterTable('eleves-table', this.value)">
+                <select class="filter-select" onchange="filterByClass('eleves', this.value)">
+                    <option value="">Toutes les classes</option>
+                </select>
+                <button class="btn" onclick="refreshData('eleves')">🔄 Actualiser</button>
+                <button class="btn btn-secondary" onclick="exportData('eleves')">📥 Exporter</button>
+            </div>
+
+            <div class="table-container">
+                <table id="eleves-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Date Naissance</th>
+                            <th>Sexe</th>
+                            <th>Établissement</th>
+                            <th>Redouble</th>
+                        </tr>
+                    </thead>
+                    <tbody id="eleves-tbody">
+                        <tr><td colspan="7" class="loading"><div class="spinner"></div>Chargement des données...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="eleves-pagination"></div>
+        </section>
+
+        <!-- Matières Section -->
+        <section id="matieres" class="section">
+            <div class="section-header">
+                <h2 class="section-title">📚 Matières</h2>
+                <div class="api-info" onclick="showApiInfo('matieres')">API: /api/matieres</div>
+            </div>
+            
+            <div class="controls">
+                <input type="text" class="search-box" placeholder="Rechercher une matière..." 
+                       oninput="filterTable('matieres-table', this.value)">
+                <select class="filter-select" onchange="filterByLevel('matieres', this.value)">
+                    <option value="">Tous les niveaux</option>
+                </select>
+                <button class="btn" onclick="refreshData('matieres')">🔄 Actualiser</button>
+                <button class="btn btn-secondary" onclick="exportData('matieres')">📥 Exporter</button>
+            </div>
+
+            <div class="table-container">
+                <table id="matieres-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Nom Matière</th>
+                            <th>Domaine</th>
+                            <th>Niveau</th>
+                            <th>Coefficient</th>
+                        </tr>
+                    </thead>
+                    <tbody id="matieres-tbody">
+                        <tr><td colspan="5" class="loading"><div class="spinner"></div>Chargement des données...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="matieres-pagination"></div>
+        </section>
+
+        <!-- Cours Section -->
+        <section id="cours" class="section">
+            <div class="section-header">
+                <h2 class="section-title">📝 Cours</h2>
+                <div class="api-info" onclick="showApiInfo('cours')">API: /api/cours</div>
+            </div>
+            
+            <div class="controls">
+                <input type="text" class="search-box" placeholder="Rechercher un cours..." 
+                       oninput="filterTable('cours-table', this.value)">
+                <select class="filter-select" onchange="filterByTeacher('cours', this.value)">
+                    <option value="">Tous les enseignants</option>
+                </select>
+                <button class="btn" onclick="refreshData('cours')">🔄 Actualiser</button>
+                <button class="btn btn-secondary" onclick="exportData('cours')">📥 Exporter</button>
+            </div>
+
+            <div class="table-container">
+                <table id="cours-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Matière</th>
+                            <th>Enseignant</th>
+                            <th>Niveau</th>
+                            <th>Durée (min)</th>
+                            <th>Année Scolaire</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cours-tbody">
+                        <tr><td colspan="6" class="loading"><div class="spinner"></div>Chargement des données...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="cours-pagination"></div>
+        </section>
+
+        <!-- Notes Section -->
+        <section id="notes" class="section">
+            <div class="section-header">
+                <h2 class="section-title">📊 Notes et Évaluations</h2>
+                <div class="api-info" onclick="showApiInfo('notes')">API: /api/notes</div>
+            </div>
+            
+            <div class="controls">
+                <input type="text" class="search-box" placeholder="Rechercher une note..." 
+                       oninput="filterTable('notes-table', this.value)">
+                <select class="filter-select" onchange="filterByEvalType('notes', this.value)">
+                    <option value="">Tous types d'évaluation</option>
+                    <option value="Devoir">Devoir</option>
+                    <option value="Composition">Composition</option>
+                    <option value="Interrogation">Interrogation</option>
+                </select>
+                <button class="btn" onclick="refreshData('notes')">🔄 Actualiser</button>
+                <button class="btn btn-secondary" onclick="exportData('notes')">📥 Exporter</button>
+            </div>
+
+            <div class="table-container">
+                <table id="notes-table">
+                    <thead>
+                        <tr>
+                            <th>ID Note</th>
+                            <th>Élève</th>
+                            <th>Cours</th>
+                            <th>Type Évaluation</th>
+                            <th>Note (/20)</th>
+                            <th>Appréciation</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notes-tbody">
+                        <tr><td colspan="6" class="loading"><div class="spinner"></div>Chargement des données...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="notes-pagination"></div>
+        </section>
+
+        <!-- Présences Section -->
+        <section id="presences" class="section">
+            <div class="section-header">
+                <h2 class="section-title">✅ Présences</h2>
+                <div class="api-info" onclick="showApiInfo('presences')">API: /api/presences</div>
+            </div>
+            
+            <div class="controls">
+                <input type="text" class="search-box" placeholder="Rechercher une présence..." 
+                       oninput="filterTable('presences-table', this.value)">
+                <select class="filter-select" onchange="filterByPresence('presences', this.value)">
+                    <option value="">Toutes les présences</option>
+                    <option value="true">Présent</option>
+                    <option value="false">Absent</option>
+                </select>
+                <button class="btn" onclick="refreshData('presences')">🔄 Actualiser</button>
+                <button class="btn btn-secondary" onclick="exportData('presences')">📥 Exporter</button>
+            </div>
+
+            <div class="table-container">
+                <table id="presences-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Élève</th>
+                            <th>Cours</th>
+                            <th>Date</th>
+                            <th>Présent</th>
+                            <th>Motif Absence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="presences-tbody">
+                        <tr><td colspan="6" class="loading"><div class="spinner"></div>Chargement des données...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="pagination" id="presences-pagination"></div>
+        </section>
+
+        <!-- API Documentation Section -->
+        <section id="api" class="section">
+            <div class="section-header">
+                <h2 class="section-title">🔌 Documentation API</h2>
+            </div>
+            
+            <div class="api-doc">
+                <h3>Endpoints disponibles</h3>
+                <p>Base URL: <code>https://education-senegal.dataflow360.com</code></p>
+                
+                <h4>🗺️ Régions</h4>
+                <div class="api-endpoint">GET /api/regions?page=1&limit=100</div>
+                <div class="api-endpoint">GET /api/regions/{id}</div>
+                
+                <h4>🏫 Établissements</h4>
+                <div class="api-endpoint">GET /api/etablissements?page=1&limit=100</div>
+                <div class="api-endpoint">GET /api/etablissements/{id}</div>
+                <div class="api-endpoint">GET /api/etablissements?region_id={id}</div>
+                
+                <h4>👨‍🏫 Enseignants</h4>
+                <div class="api-endpoint">GET /api/enseignants?page=1&limit=100</div>
+                <div class="api-endpoint">GET /api/enseignants/{id}</div>
+                <div class="api-endpoint">GET /api/enseignants?domaine={domaine}</div>
+                
+                <h4>👨‍🎓 Élèves</h4>
+                <div class="api-endpoint">GET /api/eleves?page=1&limit=100</div>
+                <div class="api-endpoint">GET /api/eleves/{id}</div>
+                <div class="api-endpoint">GET /api/eleves?etablissement_id={id}</div>
+                
+                <h4>📚 Matières</h4>
+                <div class="api-endpoint">GET /api/matieres?page=1&limit=100</div>
+                <div class="api-endpoint">GET /api/matieres/{id}</div>
+                
+                <h4>📝 Cours</h4>
+                <div class="api-endpoint">GET /api/cours?page=1&limit=100</div>
+                <div class="api-endpoint">GET /api/cours/{id}</div>
+                <div class="api-endpoint">GET /api/cours?enseignant_id={id}</div>
+                
+                <h4>📊 Notes</h4>
+                <div class="api-endpoint">GET /api/notes?page=1&limit=100</div>
+                <div class="api-endpoint">GET /api/notes?eleve_id={id}</div>
+                <div class="api-endpoint">GET /api/notes?cours_id={id}</div>
+                
+                <h4>✅ Présences</h4>
+                <div class="api-endpoint">GET /api/presences?page=1&limit=100</div>
+                <div class="api-endpoint">GET /api/presences?eleve_id={id}</div>
+                <div class="api-endpoint">GET /api/presences?cours_id={id}</div>
+                
+                <h4>Exemple de réponse JSON</h4>
+                <pre style="background: #333; color: #00ff00; padding: 1rem; border-radius: 5px; overflow-x: auto;">
+{
+  "data": [
+    {
+      "id_etablissement": 1,
+      "nom_etablissement": "Lycée Blaise Diagne",
+      "type": "Lycée",
+      "statut": "Public",
+      "region_id": 1
+    }
+  ],
+  "total": 100,
+  "page": 1,
+  "per_page": 100,
+  "total_pages": 1
+}
+                </pre>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        // Données de base - Régions du Sénégal
+        const regions = [
+            {id: 1, nom_region: "Dakar", nom_ville: "Dakar", nb_etablissements: 25, population_scolaire: 2500},
+            {id: 2, nom_region: "Thiès", nom_ville: "Thiès", nb_etablissements: 12, population_scolaire: 1200},
+            {id: 3, nom_region: "Saint-Louis", nom_ville: "Saint-Louis", nb_etablissements: 8, population_scolaire: 800},
+            {id: 4, nom_region: "Diourbel", nom_ville: "Diourbel", nb_etablissements: 6, population_scolaire: 600},
+            {id: 5, nom_region: "Louga", nom_ville: "Louga", nb_etablissements: 5, population_scolaire: 500},
+            {id: 6, nom_region: "Fatick", nom_ville: "Fatick", nb_etablissements: 4, population_scolaire: 400},
+            {id: 7, nom_region: "Kaolack", nom_ville: "Kaolack", nb_etablissements: 7, population_scolaire: 700},
+            {id: 8, nom_region: "Kolda", nom_ville: "Kolda", nb_etablissements: 5, population_scolaire: 500},
+            {id: 9, nom_region: "Ziguinchor", nom_ville: "Ziguinchor", nb_etablissements: 6, population_scolaire: 600},
+            {id: 10, nom_region: "Tambacounda", nom_ville: "Tambacounda", nb_etablissements: 4, population_scolaire: 400},
+            {id: 11, nom_region: "Kaffrine", nom_ville: "Kaffrine", nb_etablissements: 3, population_scolaire: 300},
+            {id: 12, nom_region: "Kédougou", nom_ville: "Kédougou", nb_etablissements: 2, population_scolaire: 200},
+            {id: 13, nom_region: "Matam", nom_ville: "Matam", nb_etablissements: 3, population_scolaire: 300},
+            {id: 14, nom_region: "Sédhiou", nom_ville: "Sédhiou", nb_etablissements: 4, population_scolaire: 400}
+        ];
+
+        // Noms sénégalais
+        const nomsSenegalais = {
+            prenoms_masculins: ["Abdou", "Amadou", "Moussa", "Mamadou", "Ousmane", "Cheikh", "Ibrahima", "Modou", "Pape", "Samba", "Babacar", "Alioune", "Assane", "Baba", "Demba"],
+            prenoms_feminins: ["Awa", "Fatou", "Maimouna", "Khady", "Astou", "Binta", "Mariam", "Aminata", "Ndeye", "Rokhaya", "Coumba", "Dieynaba", "Seynabou", "Yacine", "Rama"],
+            noms_famille: ["Diop", "Fall", "Ndiaye", "Seck", "Diouf", "Kane", "Sarr", "Cisse", "Gueye", "Thiam", "Ba", "Ly", "Sow", "Ndour", "Faye", "Diallo", "Diagne", "Mbaye", "Tall", "Wade"]
+        };
+
+        // Types d'établissements et matières
+        const typesEtablissements = ["École Primaire", "Collège", "Lycée", "École Technique"];
+        const statuts = ["Public", "Privé"];
+        const domainesEnseignement = ["Mathématiques", "Français", "Sciences Physiques", "Sciences Naturelles", "Histoire-Géographie", "Anglais", "Arabe", "Éducation Physique", "Arts", "Informatique"];
+        const typesEvaluation = ["Devoir", "Composition", "Interrogation"];
+        const motifsAbsence = ["Maladie", "Raisons familiales", "Problèmes de transport", "Autre", null];
+
+        // Variables pour pagination
+        let currentPage = {};
+        let currentFilters = {};
+        let allData = {};
+
+        // Génération des données
+        function generateData() {
+            // Génération des établissements (100)
+            allData.etablissements = [];
+            for (let i = 1; i <= 100; i++) {
+                const region = regions[Math.floor(Math.random() * regions.length)];
+                allData.etablissements.push({
+                    id: i,
+                    nom: generateEtablissementName(),
+                    type: typesEtablissements[Math.floor(Math.random() * typesEtablissements.length)],
+                    statut: statuts[Math.floor(Math.random() * statuts.length)],
+                    region_id: region.id,
+                    region_nom: region.nom_region,
+                    effectif: Math.floor(Math.random() * 500) + 50
+                });
+            }
+
+            // Génération des enseignants (1500)
+            allData.enseignants = [];
+            for (let i = 1; i <= 1500; i++) {
+                const isMale = Math.random() > 0.5;
+                const prenom = isMale ? 
+                    nomsSenegalais.prenoms_masculins[Math.floor(Math.random() * nomsSenegalais.prenoms_masculins.length)] :
+                    nomsSenegalais.prenoms_feminins[Math.floor(Math.random() * nomsSenegalais.prenoms_feminins.length)];
+                const nom = nomsSenegalais.noms_famille[Math.floor(Math.random() * nomsSenegalais.noms_famille.length)];
+                const etablissement = allData.etablissements[Math.floor(Math.random() * allData.etablissements.length)];
+                
+                allData.enseignants.push({
+                    id: i,
+                    nom: nom,
+                    prenom: prenom,
+                    nom_complet: `${prenom} ${nom}`,
+                    domaine: domainesEnseignement[Math.floor(Math.random() * domainesEnseignement.length)],
+                    email: `${prenom.toLowerCase()}.${nom.toLowerCase()}@${etablissement.nom.toLowerCase().replace(/\s+/g, '')}.sn`,
+                    sexe: isMale ? "M" : "F",
+                    etablissement_id: etablissement.id,
+                    etablissement_nom: etablissement.nom
+                });
+            }
+
+            // Génération des élèves (10000)
+            allData.eleves = [];
+            for (let i = 1; i <= 10000; i++) {
+                const isMale = Math.random() > 0.5;
+                const prenom = isMale ? 
+                    nomsSenegalais.prenoms_masculins[Math.floor(Math.random() * nomsSenegalais.prenoms_masculins.length)] :
+                    nomsSenegalais.prenoms_feminins[Math.floor(Math.random() * nomsSenegalais.prenoms_feminins.length)];
+                const nom = nomsSenegalais.noms_famille[Math.floor(Math.random() * nomsSenegalais.noms_famille.length)];
+                const etablissement = allData.etablissements[Math.floor(Math.random() * allData.etablissements.length)];
+                const birthYear = Math.floor(Math.random() * 15) + 2003; // Âges entre 8 et 22 ans
+                
+                allData.eleves.push({
+                    id: i,
+                    nom: nom,
+                    prenom: prenom,
+                    nom_complet: `${prenom} ${nom}`,
+                    date_naissance: `${birthYear}-${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}-${String(Math.floor(Math.random() * 28) + 1).padStart(2, '0')}`,
+                    sexe: isMale ? "M" : "F",
+                    redouble: Math.random() > 0.85 ? "Oui" : "Non",
+                    adresse: generateAdresse(etablissement.region_nom),
+                    etablissement_id: etablissement.id,
+                    etablissement_nom: etablissement.nom
+                });
+            }
+
+            // Génération des matières (250)
+            allData.matieres = [];
+            const niveaux = ["Primaire", "Collège", "Lycée", "Technique"];
+            for (let i = 1; i <= 250; i++) {
+                const domaine = domainesEnseignement[Math.floor(Math.random() * domainesEnseignement.length)];
+                const niveau = niveaux[Math.floor(Math.random() * niveaux.length)];
+                allData.matieres.push({
+                    id: i,
+                    nom_matiere: `${domaine} ${niveau} ${Math.floor(i/10) + 1}`,
+                    domaine: domaine,
+                    niveau: niveau,
+                    coefficient: Math.floor(Math.random() * 4) + 1
+                });
+            }
+
+            // Génération des cours (3750)
+            allData.cours = [];
+            for (let i = 1; i <= 3750; i++) {
+                const matiere = allData.matieres[Math.floor(Math.random() * allData.matieres.length)];
+                const enseignant = allData.enseignants.find(e => e.domaine === matiere.domaine) || 
+                                 allData.enseignants[Math.floor(Math.random() * allData.enseignants.length)];
+                
+                allData.cours.push({
+                    id: i,
+                    matiere_id: matiere.id,
+                    matiere_nom: matiere.nom_matiere,
+                    enseignant_id: enseignant.id,
+                    enseignant_nom: enseignant.nom_complet,
+                    niveau: matiere.niveau,
+                    duree: [45, 55, 90][Math.floor(Math.random() * 3)],
+                    annee_scolaire: "2024-2025"
+                });
+            }
+
+            // Génération des notes (jusqu'à 3 évaluations par cours)
+            allData.notes = [];
+            let noteId = 1;
+            allData.cours.forEach(cours => {
+                const nombreEvaluations = Math.floor(Math.random() * 3) + 1; // 1 à 3 évaluations
+                for (let eval = 0; eval < nombreEvaluations; eval++) {
+                    // Sélectionner quelques élèves pour ce cours
+                    const nombreEleves = Math.floor(Math.random() * 20) + 10; // 10 à 30 élèves par cours
+                    for (let e = 0; e < nombreEleves; e++) {
+                        const eleve = allData.eleves[Math.floor(Math.random() * allData.eleves.length)];
+                        const note = Math.floor(Math.random() * 21); // Note de 0 à 20
+                        
+                        allData.notes.push({
+                            id: noteId++,
+                            eleve_id: eleve.id,
+                            eleve_nom: eleve.nom_complet,
+                            cours_id: cours.id,
+                            cours_nom: cours.matiere_nom,
+                            type_note: typesEvaluation[eval % typesEvaluation.length],
+                            note: note,
+                            appreciation: getAppreciation(note)
+                        });
+                    }
+                }
+            });
+
+            // Génération des présences
+            allData.presences = [];
+            let presenceId = 1;
+            allData.cours.forEach(cours => {
+                // Générer des présences pour plusieurs dates
+                const nombreSeances = Math.floor(Math.random() * 10) + 5; // 5 à 15 séances
+                for (let seance = 0; seance < nombreSeances; seance++) {
+                    const date = generateRandomDate();
+                    const nombreEleves = Math.floor(Math.random() * 25) + 15; // 15 à 40 élèves
+                    
+                    for (let e = 0; e < nombreEleves; e++) {
+                        const eleve = allData.eleves[Math.floor(Math.random() * allData.eleves.length)];
+                        const isPresent = Math.random() > 0.15; // 85% de présence
+                        
+                        allData.presences.push({
+                            id: presenceId++,
+                            eleve_id: eleve.id,
+                            eleve_nom: eleve.nom_complet,
+                            cours_id: cours.id,
+                            cours_nom: cours.matiere_nom,
+                            date: date,
+                            is_present: isPresent,
+                            motif_absence: isPresent ? null : motifsAbsence[Math.floor(Math.random() * motifsAbsence.length)]
+                        });
+                    }
+                }
+            });
+
+            // Ajouter les régions aux données
+            allData.regions = regions;
+        }
+
+        // Fonctions utilitaires
+        function generateEtablissementName() {
+            const types = ["École", "Collège", "Lycée", "Institut"];
+            const noms = ["Blaise Diagne", "Cheikh Anta Diop", "Léopold Sédar Senghor", "Mariama Ba", "Lat Dior", "El Hadji Omar Tall", "Maba Diakhou Ba", "Aline Sitoe Diatta"];
+            const type = types[Math.floor(Math.random() * types.length)];
+            const nom = noms[Math.floor(Math.random() * noms.length)];
+            return `${type} ${nom}`;
+        }
+
+        function generateAdresse(region) {
+            const rues = ["Rue", "Avenue", "Boulevard"];
+            const noms = ["de l'Indépendance", "Léopold Sédar Senghor", "Blaise Diagne", "des Almadies", "de la République", "Corniche"];
+            const rue = rues[Math.floor(Math.random() * rues.length)];
+            const nom = noms[Math.floor(Math.random() * noms.length)];
+            const numero = Math.floor(Math.random() * 200) + 1;
+            return `${numero} ${rue} ${nom}, ${region}`;
+        }
+
+        function getAppreciation(note) {
+            if (note >= 16) return "Excellent";
+            if (note >= 14) return "Très bien";
+            if (note >= 12) return "Bien";
+            if (note >= 10) return "Assez bien";
+            if (note >= 8) return "Passable";
+            return "Insuffisant";
+        }
+
+        function getGradeClass(note) {
+            if (note >= 16) return "grade-excellent";
+            if (note >= 12) return "grade-good";
+            if (note >= 10) return "grade-average";
+            return "grade-poor";
+        }
+
+        function generateRandomDate() {
+            const start = new Date(2024, 8, 1); // Septembre 2024
+            const end = new Date(2025, 5, 30);   // Juin 2025
+            const date = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+            return date.toISOString().split('T')[0];
+        }
+
+        // Fonctions de pagination
+        function initializePagination(entityType) {
+            currentPage[entityType] = 1;
+            currentFilters[entityType] = {};
+        }
+
+        function getPageData(entityType, page = 1, limit = 100) {
+            let data = allData[entityType] || [];
+            
+            // Appliquer les filtres
+            const filters = currentFilters[entityType] || {};
+            if (filters.search) {
+                const searchTerm = filters.search.toLowerCase();
+                data = data.filter(item => 
+                    Object.values(item).some(value => 
+                        value && value.toString().toLowerCase().includes(searchTerm)
+                    )
+                );
+            }
+
+            const total = data.length;
+            const startIndex = (page - 1) * limit;
+            const endIndex = startIndex + limit;
+            const pageData = data.slice(startIndex, endIndex);
+
+            return {
+                data: pageData,
+                total: total,
+                page: page,
+                per_page: limit,
+                total_pages: Math.ceil(total / limit)
+            };
+        }
+
+        function renderPagination(entityType, paginationData) {
+            const paginationContainer = document.getElementById(`${entityType}-pagination`);
+            if (!paginationContainer || paginationData.total_pages <= 1) {
+                if (paginationContainer) paginationContainer.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+            
+            // Bouton Précédent
+            html += `<button class="page-btn" ${paginationData.page === 1 ? 'disabled' : ''} 
+                     onclick="changePage('${entityType}', ${paginationData.page - 1})">‹ Précédent</button>`;
+            
+            // Numéros de page
+            const maxButtons = 5;
+            let startPage = Math.max(1, paginationData.page - Math.floor(maxButtons / 2));
+            let endPage = Math.min(paginationData.total_pages, startPage + maxButtons - 1);
+            
+            if (endPage - startPage < maxButtons - 1) {
+                startPage = Math.max(1, endPage - maxButtons + 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                html += `<button class="page-btn ${i === paginationData.page ? 'active' : ''}" 
+                         onclick="changePage('${entityType}', ${i})">${i}</button>`;
+            }
+            
+            // Bouton Suivant
+            html += `<button class="page-btn" ${paginationData.page === paginationData.total_pages ? 'disabled' : ''} 
+                     onclick="changePage('${entityType}', ${paginationData.page + 1})">Suivant ›</button>`;
+            
+            // Informations
+            html += `<span class="page-info">Page ${paginationData.page} sur ${paginationData.total_pages} 
+                     (${paginationData.total} éléments)</span>`;
+
+            paginationContainer.innerHTML = html;
+        }
+
+        function changePage(entityType, page) {
+            currentPage[entityType] = page;
+            loadTableData(entityType);
+        }
+
+        // Navigation entre sections
+        function showSection(sectionName) {
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.nav-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.getElementById(sectionName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (sectionName !== 'dashboard' && sectionName !== 'api') {
+                if (!currentPage[sectionName]) {
+                    initializePagination(sectionName);
+                }
+                loadTableData(sectionName);
+                populateFilters(sectionName);
+            }
+        }
+
+        // Chargement des données dans les tableaux
+        function loadTableData(entityType) {
+            const tbody = document.getElementById(`${entityType}-tbody`);
+            if (!tbody) return;
+
+            const page = currentPage[entityType] || 1;
+            const paginationData = getPageData(entityType, page);
+            
+            let html = '';
+            
+            switch(entityType) {
+                case 'regions':
+                    paginationData.data.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td><strong>${item.nom_region}</strong></td>
+                                <td>${item.nom_ville}</td>
+                                <td><span class="badge badge-primary">${item.nb_etablissements}</span></td>
+                                <td><span class="badge badge-success">${item.population_scolaire}</span></td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'etablissements':
+                    paginationData.data.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td><strong>${item.nom}</strong></td>
+                                <td><span class="badge badge-primary">${item.type}</span></td>
+                                <td><span class="badge ${item.statut === 'Public' ? 'badge-success' : 'badge-warning'}">${item.statut}</span></td>
+                                <td>${item.region_nom}</td>
+                                <td><span class="badge badge-info">${item.effectif}</span></td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'enseignants':
+                    paginationData.data.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td><strong>${item.nom_complet}</strong></td>
+                                <td><span class="badge badge-info">${item.domaine}</span></td>
+                                <td>${item.email}</td>
+                                <td>${item.sexe}</td>
+                                <td>${item.etablissement_nom}</td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'eleves':
+                    paginationData.data.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td><strong>${item.nom}</strong></td>
+                                <td>${item.prenom}</td>
+                                <td>${item.date_naissance}</td>
+                                <td>${item.sexe}</td>
+                                <td>${item.etablissement_nom}</td>
+                                <td><span class="badge ${item.redouble === 'Non' ? 'badge-success' : 'badge-warning'}">${item.redouble}</span></td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'matieres':
+                    paginationData.data.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td><strong>${item.nom_matiere}</strong></td>
+                                <td><span class="badge badge-primary">${item.domaine}</span></td>
+                                <td><span class="badge badge-info">${item.niveau}</span></td>
+                                <td><span class="badge badge-warning">${item.coefficient}</span></td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'cours':
+                    paginationData.data.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td>${item.matiere_nom}</td>
+                                <td><strong>${item.enseignant_nom}</strong></td>
+                                <td><span class="badge badge-info">${item.niveau}</span></td>
+                                <td>${item.duree} min</td>
+                                <td><span class="badge badge-primary">${item.annee_scolaire}</span></td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'notes':
+                    paginationData.data.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td><strong>${item.eleve_nom}</strong></td>
+                                <td>${item.cours_nom}</td>
+                                <td><span class="badge badge-primary">${item.type_note}</span></td>
+                                <td><span class="grade ${getGradeClass(item.note)}">${item.note}/20</span></td>
+                                <td><span class="badge ${item.note >= 10 ? 'badge-success' : 'badge-danger'}">${item.appreciation}</span></td>
+                            </tr>
+                        `;
+                    });
+                    break;
+                    
+                case 'presences':
+                    paginationData.data.forEach(item => {
+                        html += `
+                            <tr>
+                                <td>${item.id}</td>
+                                <td><strong>${item.eleve_nom}</strong></td>
+                                <td>${item.cours_nom}</td>
+                                <td>${item.date}</td>
+                                <td><span class="badge ${item.is_present ? 'badge-success' : 'badge-danger'}">${item.is_present ? 'Présent' : 'Absent'}</span></td>
+                                <td>${item.motif_absence || '-'}</td>
+                            </tr>
+                        `;
+                    });
+                    break;
+            }
+            
+            tbody.innerHTML = html;
+            renderPagination(entityType, paginationData);
+        }
+
+        // Fonctions de filtrage
+        function filterTable(tableId, searchTerm) {
+            const entityType = tableId.replace('-table', '');
+            currentFilters[entityType] = currentFilters[entityType] || {};
+            currentFilters[entityType].search = searchTerm;
+            currentPage[entityType] = 1; // Reset à la première page
+            loadTableData(entityType);
+        }
+
+        function populateFilters(entityType) {
+            // Remplir les listes déroulantes de filtres
+            if (entityType === 'etablissements') {
+                const regionSelect = document.querySelector('#etablissements .filter-select');
+                if (regionSelect && regionSelect.children.length <= 1) {
+                    regions.forEach(region => {
+                        const option = document.createElement('option');
+                        option.value = region.nom_region;
+                        option.textContent = region.nom_region;
+                        regionSelect.appendChild(option);
+                    });
+                }
+            }
+            
+            if (entityType === 'enseignants') {
+                const domaineSelect = document.querySelector('#enseignants .filter-select');
+                if (domaineSelect && domaineSelect.children.length <= 1) {
+                    domainesEnseignement.forEach(domaine => {
+                        const option = document.createElement('option');
+                        option.value = domaine;
+                        option.textContent = domaine;
+                        domaineSelect.appendChild(option);
+                    });
+                }
+            }
+        }
+
+        // Autres fonctions utilitaires
+        function refreshData(entityType) {
+            const tbody = document.getElementById(`${entityType}-tbody`);
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="10" class="loading"><div class="spinner"></div>Actualisation des données...</td></tr>';
+                setTimeout(() => {
+                    loadTableData(entityType);
+                }, 1000);
+            }
+        }
+
+        function exportData(entityType) {
+            const data = allData[entityType] || [];
+            const csvContent = convertToCSV(data);
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${entityType}_senegal.csv`;
+            link.click();
+        }
+
+        function convertToCSV(data) {
+            if (!data.length) return '';
+            
+            const headers = Object.keys(data[0]);
+            const csvRows = [];
+            
+            csvRows.push(headers.join(','));
+            
+            for (const row of data) {
+                const values = headers.map(header => {
+                    const val = row[header];
+                    return `"${val}"`;
+                });
+                csvRows.push(values.join(','));
+            }
+            
+            return csvRows.join('\n');
+        }
+
+        function showApiInfo(entityType) {
+            alert(`API Endpoint: /api/${entityType}\n\nExemples:\nGET https://education-senegal.dataflow360.com/api/${entityType}?page=1&limit=100\nGET https://education-senegal.dataflow360.com/api/${entityType}/{id}\n\nUtilisez ces URLs pour vos scripts de scraping et consommation d'API dans votre projet DataFlow360.`);
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            generateData();
+            
+            // Initialiser les pages
+            Object.keys(allData).forEach(entityType => {
+                initializePagination(entityType);
+            });
+            
+            // Charger les données de la première section
+            loadTableData('regions');
+        });
+    </script>
+</body>
+</html>
